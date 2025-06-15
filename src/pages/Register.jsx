@@ -53,7 +53,7 @@ function Register() {
           }}
         >
           <div className="text-center mb-3">
-            <h2 className="fw-bold text-primary">GCUL LMS</h2>
+            <h2 className="fw-bold text-primary">UMT LMS</h2>
             <p className="text-muted">Create your account</p>
           </div>
 
