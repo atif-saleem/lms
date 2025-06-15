@@ -6,7 +6,8 @@ function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = (e) => {
+    e.preventDefault(); // prevent page reload
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const user = users.find(
       u => u.email === form.email && u.password === form.password
@@ -39,49 +40,54 @@ function Login() {
             borderRadius: "12px",
           }}
         >
-          <div className="text-center mb-3">
-            <h2 className="fw-bold text-primary">UMT LMS</h2>
-            <p className="text-muted">Login to your account</p>
-          </div>
+          <form onSubmit={handleLogin}>
+            <div className="text-center mb-3">
+              <h2 className="fw-bold text-primary">UMT LMS</h2>
+              <p className="text-muted">Login to your account</p>
+            </div>
 
-          <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              className="form-control"
-              placeholder="Enter your email"
-              onChange={e => setForm({ ...form, email: e.target.value })}
-            />
-          </div>
+            <div className="mb-3">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                placeholder="Enter your email"
+                onChange={e => setForm({ ...form, email: e.target.value })}
+                required
+              />
+            </div>
 
-          <div className="mb-3">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              placeholder="Enter your password"
-              onChange={e => setForm({ ...form, password: e.target.value })}
-            />
-          </div>
+            <div className="mb-3">
+              <label className="form-label">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                placeholder="Enter your password"
+                onChange={e => setForm({ ...form, password: e.target.value })}
+                required
+              />
+            </div>
 
-          <div className="d-grid mb-3">
-            <button className="btn btn-primary" onClick={handleLogin}>
-              Login
-            </button>
-          </div>
-
-          <div className="text-center">
-            <p className="mb-0">
-              Don't have an account?{" "}
-              <button
-                onClick={() => navigate("/register")}
-                className="btn btn-link p-0"
-                style={{ fontSize: "1rem" }}
-              >
-                Sign up
+            <div className="d-grid mb-3">
+              <button type="submit" className="btn btn-primary">
+                Login
               </button>
-            </p>
-          </div>
+            </div>
+
+            <div className="text-center">
+              <p className="mb-0">
+                Don't have an account?{" "}
+                <button
+                  onClick={() => navigate("/register")}
+                  className="btn btn-link p-0"
+                  style={{ fontSize: "1rem" }}
+                  type="button"
+                >
+                  Sign up
+                </button>
+              </p>
+            </div>
+          </form>
         </div>
       </div>
     </div>

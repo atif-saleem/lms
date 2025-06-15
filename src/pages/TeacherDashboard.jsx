@@ -7,14 +7,15 @@ function TeacherDashboard() {
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({ title: "", description: "", lessons: "" });
   const [editId, setEditId] = useState(null);
+  const [message, setMessage] = useState("");
+  const [showMessage, setShowMessage] = useState(false);
 
-useEffect(() => {
-  if (!user) return;
+  useEffect(() => {
+    if (!user) return;
 
-  const all = JSON.parse(localStorage.getItem("courses")) || [];
-  setCourses(all.filter((c) => c.teacher === user.email));
-}, [user]);
-
+    const all = JSON.parse(localStorage.getItem("courses")) || [];
+    setCourses(all.filter((c) => c.teacher === user.email));
+  }, [user]);
 
   const saveCourses = (updated) => {
     const all = JSON.parse(localStorage.getItem("courses")) || [];
@@ -22,10 +23,16 @@ useEffect(() => {
     localStorage.setItem("courses", JSON.stringify([...others, ...updated]));
     setCourses(updated);
   };
-  if (!user || user.role !== "teacher") {
-  return null; // Or navigate("/") if you want redirect
-}
 
+  const showToast = (msg) => {
+    setMessage(msg);
+    setShowMessage(true);
+    setTimeout(() => setShowMessage(false), 3000); // Hide after 3 seconds
+  };
+
+  if (!user || user.role !== "teacher") {
+    return null; // Or use navigate("/") if you want to redirect
+  }
 
   const handleAddOrUpdate = () => {
     const lessonsArray = form.lessons.split(",").map((l) => l.trim());
@@ -35,6 +42,7 @@ useEffect(() => {
         c.id === editId ? { ...c, ...form, lessons: lessonsArray } : c
       );
       saveCourses(updated);
+      showToast("Course updated successfully!");
       setEditId(null);
     } else {
       const newCourse = {
@@ -46,6 +54,7 @@ useEffect(() => {
       };
       const updated = [...courses, newCourse];
       saveCourses(updated);
+      showToast("Course added successfully!");
     }
 
     setForm({ title: "", description: "", lessons: "" });
@@ -63,11 +72,21 @@ useEffect(() => {
   const handleDelete = (id) => {
     const updated = courses.filter((c) => c.id !== id);
     saveCourses(updated);
+    showToast("Course deleted successfully!");
   };
 
   return (
     <>
       <Navbar />
+
+      {showMessage && (
+        <div className="position-fixed top-0 start-50 translate-middle-x mt-3 z-3">
+          <div className="alert alert-success shadow-sm" role="alert">
+            {message}
+          </div>
+        </div>
+      )}
+
       <div className="container mt-4">
         <h2 className="text-primary text-center mb-4">Welcome, {user.email}</h2>
 
@@ -83,7 +102,9 @@ useEffect(() => {
                   className="form-control"
                   placeholder="Course Title"
                   value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, title: e.target.value })
+                  }
                 />
               </div>
               <div className="col-md-4">
@@ -92,7 +113,9 @@ useEffect(() => {
                   className="form-control"
                   placeholder="Description"
                   value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
                 />
               </div>
               <div className="col-md-4">
@@ -101,7 +124,9 @@ useEffect(() => {
                   className="form-control"
                   placeholder="Lessons (comma separated)"
                   value={form.lessons}
-                  onChange={(e) => setForm({ ...form, lessons: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, lessons: e.target.value })
+                  }
                 />
               </div>
             </div>
