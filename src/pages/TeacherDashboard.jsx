@@ -27,11 +27,11 @@ function TeacherDashboard() {
   const showToast = (msg) => {
     setMessage(msg);
     setShowMessage(true);
-    setTimeout(() => setShowMessage(false), 3000); // Hide after 3 seconds
+    setTimeout(() => setShowMessage(false), 3000);
   };
 
   if (!user || user.role !== "teacher") {
-    return null; // Or use navigate("/") if you want to redirect
+    return null;
   }
 
   const handleAddOrUpdate = () => {
@@ -90,6 +90,7 @@ function TeacherDashboard() {
       <div className="container mt-4">
         <h2 className="text-primary text-center mb-4">Welcome, {user.email}</h2>
 
+        {/* Add / Update Form */}
         <div className="card shadow-sm mb-5">
           <div className="card-body">
             <h4 className="card-title mb-3">
@@ -138,6 +139,7 @@ function TeacherDashboard() {
           </div>
         </div>
 
+        {/* Course List */}
         <h4 className="mb-3">Your Courses</h4>
         <div className="row">
           {courses.length === 0 && <p>No courses added yet.</p>}
@@ -152,18 +154,36 @@ function TeacherDashboard() {
                       Lessons: {(course.lessons || []).join(", ")}
                     </small>
                   </div>
-                  <div className="mt-3 d-flex justify-content-between">
+                  <div className="mt-3 d-flex flex-column gap-2">
+                    <div className="d-flex justify-content-between">
+                      <button
+                        className="btn btn-outline-primary btn-sm w-50 me-1"
+                        onClick={() => handleEdit(course)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-outline-danger btn-sm w-50 ms-1"
+                        onClick={() => handleDelete(course.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                     <button
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => handleEdit(course)}
+                      className="btn btn-outline-success btn-sm"
+                      onClick={() =>
+                        window.location.href = `/add-quiz?courseId=${course.id}`
+                      }
                     >
-                      Edit
+                      Manage Quiz
                     </button>
                     <button
-                      className="btn btn-outline-danger btn-sm"
-                      onClick={() => handleDelete(course.id)}
+                      className="btn btn-outline-warning btn-sm"
+                      onClick={() =>
+                        window.location.href = `/attendance?courseId=${course.id}`
+                      }
                     >
-                      Delete
+                      Take Attendance
                     </button>
                   </div>
                 </div>

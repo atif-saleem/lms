@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getUser } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import Quiz from "../components/Quiz"; // ✅ Import Quiz
 
 function StudentDashboard() {
   const user = getUser();
@@ -9,6 +10,7 @@ function StudentDashboard() {
   const [courses, setCourses] = useState([]);
   const [joined, setJoined] = useState([]);
   const [activeLessons, setActiveLessons] = useState([]);
+  const [activeQuizCourseId, setActiveQuizCourseId] = useState(null); // ✅ Track quiz state
 
   useEffect(() => {
     if (!user || user.role !== "student") {
@@ -28,17 +30,29 @@ function StudentDashboard() {
   }, [user, navigate]);
 
   const joinCourse = (courseId) => {
-    const enrollments = JSON.parse(localStorage.getItem("enrollments")) || [];
+  const enrollments = JSON.parse(localStorage.getItem("enrollments")) || [];
 
-    if (enrollments.find((e) => e.email === user.email && e.courseId === courseId)) return;
+  // 🔍 Check if this student is already enrolled in the course
+  const alreadyEnrolled = enrollments.some(
+    (e) => e.email === user.email && e.courseId === courseId
+  );
 
-    const updated = [...enrollments, { email: user.email, courseId }];
-    localStorage.setItem("enrollments", JSON.stringify(updated));
-    setJoined([...joined, courseId]);
-  };
+  if (alreadyEnrolled) return;
+
+  // ✅ Add new enrollment
+  const updatedEnrollments = [...enrollments, { email: user.email, courseId }];
+  localStorage.setItem("enrollments", JSON.stringify(updatedEnrollments));
+
+  // ✅ Update local state for joined courses
+  const updatedJoined = [...joined, courseId];
+  setJoined(updatedJoined);
+  localStorage.setItem("joined_" + user.email, JSON.stringify(updatedJoined));
+};
+
 
   const showLessons = (course) => {
     setActiveLessons(course.lessons || []);
+    setActiveQuizCourseId(null); // hide quiz when switching lessons
   };
 
   if (!user) return null;
@@ -65,12 +79,20 @@ function StudentDashboard() {
                   </div>
                   <div className="mt-3">
                     {joined.includes(course.id) ? (
-                      <button
-                        onClick={() => showLessons(course)}
-                        className="btn btn-outline-success w-100"
-                      >
-                        View Lessons
-                      </button>
+                      <>
+                        <button
+                          onClick={() => showLessons(course)}
+                          className="btn btn-outline-success w-100 mb-2"
+                        >
+                          View Lessons
+                        </button>
+                        <button
+                          onClick={() => setActiveQuizCourseId(course.id)}
+                          className="btn btn-outline-primary w-100"
+                        >
+                          Take Quiz
+                        </button>
+                      </>
                     ) : (
                       <button
                         onClick={() => joinCourse(course.id)}
@@ -96,6 +118,13 @@ function StudentDashboard() {
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {activeQuizCourseId && (
+          <div className="mt-5">
+            <h4>Quiz</h4>
+            <Quiz courseId={activeQuizCourseId} />
           </div>
         )}
       </div>
